@@ -1,0 +1,109 @@
+.budget-bar-container {
+  width: 100%;
+}
+
+.budget-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-sm);
+}
+
+.budget-spent {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.budget-of {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.budget-status {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.budget-status-safe {
+  background: var(--accent-success-light);
+  color: var(--accent-success);
+}
+
+.budget-status-moderate {
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+}
+
+.budget-status-warning {
+  background: var(--accent-warning-light);
+  color: var(--accent-warning);
+}
+
+.budget-status-danger {
+  background: var(--accent-danger-light);
+  color: var(--accent-danger);
+}
+
+/* Track */
+.budget-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budget-bar-sm .budget-bar-track { height: 4px; }
+.budget-bar-lg .budget-bar-track { height: 12px; }
+
+/* Fill */
+.budget-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: progressFill 1s ease-out;
+  position: relative;
+}
+
+.budget-fill-safe {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.budget-fill-moderate {
+  background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+}
+
+.budget-fill-warning {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.budget-fill-danger {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Footer */
+.budget-bar-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+}
+
+.budget-percentage {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.budget-remaining {
+  font-size: var(--font-size-xs);
+  color: var(--accent-success);
+}
+
+.budget-over {
+  font-size: var(--font-size-xs);
+  color: var(--accent-danger);
+  font-weight: 600;
+}

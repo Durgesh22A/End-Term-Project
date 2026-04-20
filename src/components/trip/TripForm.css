@@ -1,0 +1,52 @@
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.destination-group {
+  position: relative;
+}
+
+.destination-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.destination-suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.625rem var(--space-md);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.destination-suggestion:hover {
+  background: var(--bg-input);
+}
+
+.dest-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.dest-country {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}

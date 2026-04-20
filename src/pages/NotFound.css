@@ -1,0 +1,46 @@
+.not-found-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+}
+
+.not-found-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.not-found-icon {
+  font-size: 80px;
+  animation: floatShape 4s ease-in-out infinite;
+}
+
+.not-found-title {
+  font-size: 5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.not-found-subtitle {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.not-found-text {
+  color: var(--text-muted);
+  max-width: 360px;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}

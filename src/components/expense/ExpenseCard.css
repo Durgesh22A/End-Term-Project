@@ -1,0 +1,90 @@
+.expense-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.expense-card:hover {
+  background: var(--bg-glass);
+  border-color: var(--border-subtle);
+}
+
+.expense-category-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.expense-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.expense-desc {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expense-meta {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.expense-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.expense-value {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.expense-actions {
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.expense-card:hover .expense-actions {
+  opacity: 1;
+}
+
+.expense-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.expense-action-btn:hover {
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.expense-delete-btn:hover {
+  background: var(--accent-danger-light);
+  color: var(--accent-danger);
+}

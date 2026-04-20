@@ -1,0 +1,71 @@
+.pie-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pie-chart-wrapper {
+  width: 100%;
+}
+
+.pie-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.pie-tooltip {
+  padding: var(--space-sm) var(--space-md) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-xs);
+}
+
+.pie-tooltip-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pie-tooltip-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.pie-tooltip-pct {
+  color: var(--text-muted);
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+}
+
+.pie-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.pie-legend-label {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.pie-legend-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}

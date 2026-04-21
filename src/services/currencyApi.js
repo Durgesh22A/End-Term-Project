@@ -1,4 +1,4 @@
-const BASE_URL = 'https://api.frankfurter.app';
+const BASE_URL = 'https://open.er-api.com/v6/latest';
 
 let cachedRates = {};
 let lastFetchBase = null;
@@ -23,7 +23,7 @@ export async function fetchRates(baseCurrency = 'INR') {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/latest?base=${baseCurrency}`);
+    const response = await fetch(`${BASE_URL}/${baseCurrency}`);
     if (!response.ok) throw new Error('Failed to fetch exchange rates');
     
     const data = await response.json();
@@ -45,11 +45,14 @@ export async function convertCurrency(amount, from, to) {
   if (from === to) return amount;
   
   try {
-    const response = await fetch(`${BASE_URL}/latest?amount=${amount}&from=${from}&to=${to}`);
+    const response = await fetch(`${BASE_URL}/${from}`);
     if (!response.ok) throw new Error('Currency conversion failed');
     
     const data = await response.json();
-    return data.rates[to];
+    if (data.rates && data.rates[to]) {
+      return amount * data.rates[to];
+    }
+    throw new Error('Rate not found');
   } catch (error) {
     // Fallback: use hardcoded rates
     console.warn('Currency API blocked, using fallback conversion');

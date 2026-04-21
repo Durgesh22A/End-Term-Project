@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, MapPin, Calendar, Wallet, Trash2, Edit3, 
-  PlusCircle, ArrowLeftRight, Cloud
+  PlusCircle, ArrowLeftRight, Cloud, Sparkles, Users, 
+  Gauge, RefreshCw
 } from 'lucide-react';
 import { useTrip } from '../hooks/useTrip';
 import { useExpenses } from '../hooks/useExpenses';
@@ -15,12 +16,15 @@ import ExpenseList from '../components/expense/ExpenseList';
 import ExpenseForm from '../components/expense/ExpenseForm';
 import TripForm from '../components/trip/TripForm';
 import WeatherWidget from '../components/weather/WeatherWidget';
+import ItineraryView from '../components/itinerary/ItineraryView';
+import ItinerarySkeleton from '../components/itinerary/ItinerarySkeleton';
 import Modal from '../components/common/Modal';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import Button from '../components/common/Button';
 import { PageLoader } from '../components/common/Loader';
 import { getCurrencySymbol } from '../utils/formatCurrency';
-import { formatDateRange, getDaysInfo, CURRENCIES } from '../utils/constants';
+import { formatDateRange, getDaysInfo, CURRENCIES, INTERESTS, PACE_OPTIONS } from '../utils/constants';
+import { generateItinerary } from '../services/itineraryService';
 import './TripDetail.css';
 
 export default function TripDetail() {
@@ -35,9 +39,14 @@ export default function TripDetail() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   
+  // Itinerary state
+  const [generatingItinerary, setGeneratingItinerary] = useState(false);
+  const [itineraryError, setItineraryError] = useState(null);
+  
   // Confirm dialogs
   const [showDeleteTrip, setShowDeleteTrip] = useState(false);
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
   
   // Currency converter state
   const [convertAmount, setConvertAmount] = useState(1000);
@@ -50,6 +59,43 @@ export default function TripDetail() {
 
   const symbol = getCurrencySymbol(trip?.currency);
 
+  // ─── Itinerary generation ───
+  const handleGenerateItinerary = async () => {
+    if (trip?.itinerary?.days?.length > 0) {
+      setShowRegenerateConfirm(true);
+      return;
+    }
+    await doGenerateItinerary();
+  };
+
+  const doGenerateItinerary = async () => {
+    setGeneratingItinerary(true);
+    setItineraryError(null);
+    setShowRegenerateConfirm(false);
+
+    try {
+      const itinerary = await generateItinerary(trip);
+      await updateTrip(tripId, { itinerary });
+    } catch (err) {
+      console.error('Itinerary generation failed:', err);
+      const msg = err.message || '';
+      if (msg === 'GEMINI_API_KEY_MISSING') {
+        setItineraryError('Gemini API key is not configured. Add VITE_GEMINI_API_KEY to your .env file.');
+      } else if (msg === 'GEMINI_RATE_LIMITED') {
+        setItineraryError('API rate limit reached. Please wait a minute and try again.');
+      } else if (msg === 'GEMINI_API_FORBIDDEN') {
+        setItineraryError('API key is invalid or restricted. Please check your Gemini API key.');
+      } else if (msg === 'GEMINI_EMPTY_RESPONSE') {
+        setItineraryError('AI returned an empty response. Please try again.');
+      } else {
+        setItineraryError('Failed to generate itinerary. Please try again.');
+      }
+    } finally {
+      setGeneratingItinerary(false);
+    }
+  };
+
+  // ─── Expense handlers ───
   const handleAddExpense = async (data) => {
     setFormLoading(true);
     try {
@@ -106,6 +152,8 @@ export default function TripDetail() {
   }
 
   const daysInfo = getDaysInfo(trip.startDate, trip.endDate);
+  const paceLabel = PACE_OPTIONS.find(p => p.id === trip.pace)?.label || 'Balanced';
+  const hasItinerary = trip.itinerary?.days?.length > 0;
 
   return (
     <div className="trip-detail-page animate-fade-in">
@@ -116,6 +164,15 @@ export default function TripDetail() {
           <span>Back</span>
         </button>
         <div className="trip-detail-actions">
+          <Button 
+            variant="primary" 
+            icon={hasItinerary ? RefreshCw : Sparkles} 
+            size="sm" 
+            onClick={handleGenerateItinerary}
+            loading={generatingItinerary}
+          >
+            {hasItinerary ? 'Regenerate' : 'Generate Itinerary'}
+          </Button>
           <Button variant="secondary" icon={Edit3} size="sm" onClick={() => setShowEditTrip(true)}>
             Edit
           </Button>
@@ -128,17 +185,74 @@ export default function TripDetail() {
       {/* Trip Info */}
       <div className="trip-detail-info">
         <h1 className="page-title">
-          <MapPin size={28} style={{ display: 'inline', verticalAlign: 'middle' }} />
-          {' '}{trip.destination}
+          {trip.tripName || trip.destination}
         </h1>
         <div className="trip-detail-meta">
+          <span><MapPin size={14} /> {trip.destination}</span>
           <span><Calendar size={14} /> {formatDateRange(trip.startDate, trip.endDate)}</span>
           <span><Wallet size={14} /> {symbol}{trip.budget?.toLocaleString('en-IN')}</span>
+          {trip.travelers > 0 && <span><Users size={14} /> {trip.travelers} traveler(s)</span>}
+          <span><Gauge size={14} /> {paceLabel}</span>
           <span>{daysInfo.label}</span>
         </div>
+
+        {/* Interests */}
+        {trip.interests?.length > 0 && (
+          <div className="trip-detail-interests">
+            {trip.interests.map(id => {
+              const interest = INTERESTS.find(i => i.id === id);
+              return interest ? (
+                <span key={id} className="detail-interest-chip">
+                  {interest.emoji} {interest.label}
+                </span>
+              ) : null;
+            })}
+          </div>
+        )}
+
+        {/* Notes */}
+        {trip.notes && (
+          <div className="trip-detail-notes">
+            <span className="notes-label">Notes:</span> {trip.notes}
+          </div>
+        )}
       </div>
 
-      {/* Main Grid */}
+      {/* Itinerary Error */}
+      {itineraryError && (
+        <div className="itinerary-error glass-card animate-fade-in">
+          <Sparkles size={18} />
+          <p>{itineraryError}</p>
+        </div>
+      )}
+
+      {/* Itinerary Loading */}
+      {generatingItinerary && <ItinerarySkeleton />}
+
+      {/* Itinerary */}
+      {hasItinerary && !generatingItinerary && (
+        <div className="glass-card detail-card itinerary-section animate-fade-in-up">
+          <ItineraryView itinerary={trip.itinerary} />
+        </div>
+      )}
+
+      {/* Generate CTA (if no itinerary) */}
+      {!hasItinerary && !generatingItinerary && (
+        <div className="itinerary-cta glass-card animate-fade-in-up">
+          <div className="itinerary-cta-icon">✨</div>
+          <h3>Generate AI Itinerary</h3>
+          <p>Get a personalized day-wise travel plan powered by AI, based on your preferences, budget, and interests.</p>
+          <Button 
+            icon={Sparkles} 
+            onClick={handleGenerateItinerary}
+            size="lg"
+          >
+            Generate Itinerary
+          </Button>
+        </div>
+      )}
+
+      {/* Main Grid — Expenses & Tools */}
       <div className="trip-detail-grid">
         {/* Left Column — Expenses */}
         <div className="trip-detail-left">
@@ -257,6 +371,8 @@ export default function TripDetail() {
         </div>
       </div>
 
+      {/* ─── Modals ─── */}
+
       {/* Add Expense Modal */}
       <Modal isOpen={showExpenseForm} onClose={() => setShowExpenseForm(false)} title="Add Expense">
         <ExpenseForm onSubmit={handleAddExpense} loading={formLoading} currency={trip.currency} />
@@ -283,7 +399,7 @@ export default function TripDetail() {
         onClose={() => setShowDeleteTrip(false)}
         onConfirm={handleDeleteTrip}
         title="Delete Trip?"
-        message={`This will permanently delete "${trip.destination}" and all its expenses. This action cannot be undone.`}
+        message={`This will permanently delete "${trip.tripName || trip.destination}" and all its expenses. This action cannot be undone.`}
         confirmText="Delete Trip"
         variant="danger"
       />
@@ -297,6 +413,17 @@ export default function TripDetail() {
         message="This expense will be permanently removed from this trip."
         confirmText="Delete"
         variant="danger"
+      />
+
+      {/* Regenerate Itinerary Confirm */}
+      <ConfirmDialog
+        isOpen={showRegenerateConfirm}
+        onClose={() => setShowRegenerateConfirm(false)}
+        onConfirm={doGenerateItinerary}
+        title="Regenerate Itinerary?"
+        message="This will replace your current AI-generated itinerary with a new one. This action cannot be undone."
+        confirmText="Regenerate"
+        variant="primary"
       />
     </div>
   );

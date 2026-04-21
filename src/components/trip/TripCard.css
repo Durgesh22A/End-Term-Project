@@ -1,62 +1,120 @@
+/* ===== Trip Card Styles ===== */
+
 .trip-card {
   padding: var(--space-lg);
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  cursor: pointer;
-  transition: all var(--transition-base);
 }
 
 .trip-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
 }
 
-.trip-card:focus {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
-}
-
+/* Header */
 .trip-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-}
-
-.trip-destination {
-  display: flex;
-  align-items: center;
   gap: var(--space-sm);
-  color: var(--accent-primary);
 }
 
-.trip-destination h3 {
-  font-size: var(--font-size-lg);
+.trip-card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.trip-card-name {
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.trip-destination-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+}
+
+.trip-card-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.trip-itinerary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Meta */
 .trip-card-meta {
   display: flex;
-  gap: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
 }
 
 .trip-meta-item {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 4px;
   font-size: var(--font-size-xs);
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
+/* Interest pills */
+.trip-card-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.trip-interest-pill {
+  padding: 0.15rem 0.5rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.trip-interest-more {
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+}
+
+/* Footer */
 .trip-card-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-xs);
+}
+
+.trip-days {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
+  font-weight: 500;
+}
+
+.trip-pace-label {
+  font-size: var(--font-size-xs);
+  color: var(--accent-primary);
+  font-weight: 600;
 }
 
 .trip-spent {
+  font-size: var(--font-size-xs);
+  color: var(--accent-warning);
   font-weight: 600;
-  color: var(--text-secondary);
 }

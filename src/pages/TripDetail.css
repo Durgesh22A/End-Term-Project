@@ -155,8 +155,121 @@
   color: var(--text-muted);
 }
 
+/* ─── Trip Detail Interests ─── */
+.trip-detail-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.detail-interest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.3rem 0.7rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ─── Trip Notes ─── */
+.trip-detail-notes {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.notes-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ─── Itinerary Section ─── */
+.itinerary-section {
+  margin-bottom: var(--space-lg);
+}
+
+/* Itinerary CTA */
+.itinerary-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.itinerary-cta-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-md);
+}
+
+.itinerary-cta h3 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+}
+
+.itinerary-cta p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  max-width: 420px;
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+}
+
+/* Itinerary Error */
+.itinerary-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  border-left: 3px solid var(--accent-warning);
+  color: var(--accent-warning);
+}
+
+.itinerary-error p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ─── Itinerary Skeleton ─── */
+.itinerary-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
 @media (max-width: 1024px) {
   .trip-detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trip-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .trip-detail-actions {
+    flex-wrap: wrap;
+  }
+
+  .trip-detail-meta {
+    gap: var(--space-sm) var(--space-md);
   }
 }

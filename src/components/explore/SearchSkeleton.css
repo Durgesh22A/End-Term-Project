@@ -1,0 +1,199 @@
+/* ===== Search Skeleton Styles ===== */
+
+.search-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+/* Shimmer animation background */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Hero skeleton */
+.skeleton-hero {
+  width: 100%;
+  height: 320px;
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-hero-overlay {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* AI Indicator */
+.skeleton-ai-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--accent-primary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ai-pulse-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  position: relative;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.ai-pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-primary);
+  animation: pulseRing 1.5s ease-out infinite;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Skeleton lines */
+.skeleton-line {
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.skeleton-line-lg {
+  width: 240px;
+  height: 28px;
+}
+
+.skeleton-line-md {
+  width: 180px;
+}
+
+.skeleton-line-sm {
+  width: 120px;
+}
+
+.skeleton-line-full {
+  width: 100%;
+}
+
+.skeleton-section-title {
+  width: 200px;
+  height: 22px;
+  margin-bottom: var(--space-md);
+}
+
+/* Skeleton cards grid */
+.skeleton-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: fadeInUp var(--transition-slow) ease-out both;
+}
+
+.skeleton-card-image {
+  width: 100%;
+  height: 180px;
+}
+
+.skeleton-card-body {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Cuisine skeleton */
+.skeleton-cuisine-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.skeleton-cuisine {
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  animation: fadeInUp var(--transition-slow) ease-out both;
+}
+
+.skeleton-cuisine-image {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius-md);
+}
+
+/* Info grid skeleton */
+.skeleton-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.skeleton-info-card {
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skeleton-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .skeleton-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .skeleton-cuisine-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .skeleton-hero {
+    height: 200px;
+  }
+  .skeleton-cards-grid,
+  .skeleton-cuisine-grid,
+  .skeleton-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

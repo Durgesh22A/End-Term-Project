@@ -83,7 +83,10 @@ export function TripProvider({ children }) {
   const updateTrip = useCallback(async (tripId, tripData) => {
     if (!user || !db) return;
     const tripRef = doc(db, 'users', user.uid, 'trips', tripId);
-    await updateDoc(tripRef, tripData);
+    await updateDoc(tripRef, {
+      ...tripData,
+      updatedAt: serverTimestamp(),
+    });
   }, [user]);
 
   const deleteTrip = useCallback(async (tripId) => {

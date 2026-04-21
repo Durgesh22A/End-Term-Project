@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Map, 
+  Compass,
   PlusCircle, 
   LogOut, 
   Plane,
@@ -15,6 +16,7 @@ import './Navbar.css';
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/trips', icon: Map, label: 'My Trips' },
+  { path: '/explore', icon: Compass, label: 'Explore' },
   { path: '/add-expense', icon: PlusCircle, label: 'Add Expense' },
 ];
 
@@ -54,7 +56,7 @@ export default function Navbar() {
           </div>
           <div className="brand-text">
             <h1 className="brand-name">TripLedger</h1>
-            <span className="brand-tagline">Budget Planner</span>
+            <span className="brand-tagline">AI Travel Planner</span>
           </div>
           <button className="mobile-close-btn" onClick={closeMobile}>
             <X size={20} />

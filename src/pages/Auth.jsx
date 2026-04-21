@@ -81,7 +81,7 @@ export default function Auth() {
           </div>
           <h1 className="auth-brand-name">TripLedger</h1>
           <p className="auth-brand-tagline">
-            Smart Travel Budget & Itinerary Planner
+            AI-Powered Travel Planner & Budget Tracker
           </p>
         </div>
 

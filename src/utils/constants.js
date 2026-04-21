@@ -42,6 +42,29 @@ export const CURRENCIES = [
 ];
 
 /**
+ * Trip interest categories for personalized itinerary generation
+ */
+export const INTERESTS = [
+  { id: 'culture', label: 'Culture', emoji: '🎭' },
+  { id: 'history', label: 'History', emoji: '🏛️' },
+  { id: 'beaches', label: 'Beaches', emoji: '🏖️' },
+  { id: 'adventure', label: 'Adventure', emoji: '🧗' },
+  { id: 'food', label: 'Food', emoji: '🍜' },
+  { id: 'nature', label: 'Nature', emoji: '🌿' },
+  { id: 'shopping', label: 'Shopping', emoji: '🛍️' },
+  { id: 'nightlife', label: 'Nightlife', emoji: '🌃' },
+];
+
+/**
+ * Trip pace options
+ */
+export const PACE_OPTIONS = [
+  { id: 'fast', label: 'Fast-paced', emoji: '⚡', desc: 'Pack in maximum activities' },
+  { id: 'balanced', label: 'Balanced', emoji: '⚖️', desc: 'Mix of activities and rest' },
+  { id: 'relaxed', label: 'Relaxed', emoji: '🌅', desc: 'Slow travel, fewer spots' },
+];
+
+/**
  * Trip status based on dates
  */
 export function getTripStatus(startDate, endDate) {

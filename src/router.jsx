@@ -10,6 +10,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Trips = lazy(() => import('./pages/Trips'));
 const TripDetail = lazy(() => import('./pages/TripDetail'));
 const AddExpense = lazy(() => import('./pages/AddExpense'));
+const Explore = lazy(() => import('./pages/Explore'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function LazyPage({ children }) {
@@ -66,6 +67,14 @@ const router = createBrowserRouter([
         element: (
           <LazyPage>
             <AddExpense />
+          </LazyPage>
+        ),
+      },
+      {
+        path: 'explore',
+        element: (
+          <LazyPage>
+            <Explore />
           </LazyPage>
         ),
       },

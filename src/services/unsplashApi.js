@@ -105,14 +105,23 @@ export async function fetchPlacePhoto(searchTerm) {
     };
   }
 
-  // Return placeholder gradient
+  // Fallback: Use LoremFlickr for real photos based on search term
+  // LoremFlickr works best with comma-separated tags instead of spaces
+  const tags = searchTerm.toLowerCase().replace(/\s+/g, ',');
   const gradientIndex = Math.abs(hashString(searchTerm)) % PLACEHOLDER_GRADIENTS.length;
+  const url = `https://loremflickr.com/800/600/${tags},travel`;
+  const urlSmall = `https://loremflickr.com/400/300/${tags},travel`;
+
+  console.log(`[Photo Service] Fetching for: "${searchTerm}" | URL: ${url}`);
+
   return {
-    url: null,
-    urlSmall: null,
+    url,
+    urlSmall,
     alt: searchTerm,
+    photographer: 'LoremFlickr',
+    photographerUrl: 'https://loremflickr.com',
     gradient: PLACEHOLDER_GRADIENTS[gradientIndex],
-    isPlaceholder: true,
+    isPlaceholder: false,
   };
 }
 

@@ -113,6 +113,50 @@
   background: var(--bg-glass);
   border: 1px solid var(--border-subtle);
   transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.itinerary-slot.has-image {
+  flex-direction: row;
+  padding: 0;
+}
+
+.slot-image {
+  width: 160px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: transform 0.5s ease;
+}
+
+.itinerary-slot:hover .slot-image {
+  transform: scale(1.05);
+}
+
+.slot-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.1));
+}
+
+.itinerary-slot.has-image .slot-time-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  background: rgba(15, 23, 42, 0.7) !important;
+  color: white !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.itinerary-slot.has-image .slot-content {
+  padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-md);
 }
 
 .itinerary-slot:hover {

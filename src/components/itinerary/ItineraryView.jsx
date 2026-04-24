@@ -32,9 +32,15 @@ function TimeSlot({ slot, timeKey }) {
   if (!slot) return null;
   const config = TIME_CONFIG[timeKey];
   const Icon = config.icon;
+  const photoUrl = slot.photo?.url || slot.photo?.urlSmall;
 
   return (
-    <div className={`itinerary-slot ${config.colorClass}`}>
+    <div className={`itinerary-slot ${config.colorClass} ${photoUrl ? 'has-image' : ''}`}>
+      {photoUrl && (
+        <div className="slot-image" style={{ backgroundImage: `url(${photoUrl})` }}>
+          <div className="slot-image-overlay" />
+        </div>
+      )}
       <div className="slot-time-badge">
         <Icon size={14} />
         <span>{config.label}</span>

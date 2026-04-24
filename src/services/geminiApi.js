@@ -1,10 +1,40 @@
 /**
  * Google Gemini AI API service for generating travel destination content.
- * Uses Gemini 2.0 Flash with structured JSON output.
- * Includes retry logic for rate limits (429) with exponential backoff.
+ * Uses the @google/genai SDK with Gemma 4 26B model and High Thinking level.
  */
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+// Initialize the SDK with your API key from environment variables
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const ai = new GoogleGenAI({ apiKey });
+
+// Model ID from user snippet
+const MODEL_NAME = "gemma-4-26b-a4b-it";
+
+/**
+ * Robustly extract JSON from a string that might contain mixed content (like thinking thoughts)
+ */
+function extractJSON(text) {
+  if (!text) return null;
+  try {
+    // Try cleaning standard markdown blocks first
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (err) {
+    // If that fails, try finding the first '{' and last '}'
+    try {
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        const jsonStr = text.substring(start, end + 1);
+        return JSON.parse(jsonStr);
+      }
+    } catch (innerErr) {
+      console.error('Failed to extract JSON from segment:', text.substring(0, 100) + '...');
+    }
+    return null;
+  }
+}
 
 /**
  * Generate travel suggestions for a destination using Gemini AI
@@ -13,9 +43,8 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/
  * @throws {Error} If API key is missing or all retries fail
  */
 export async function generateTravelSuggestions(destination) {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
   if (!apiKey) {
+    console.error('Gemini API Error: Missing VITE_GEMINI_API_KEY');
     throw new Error('GEMINI_API_KEY_MISSING');
   }
 
@@ -85,52 +114,51 @@ Requirements:
     }
 
     try {
-      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-            responseMimeType: 'application/json',
+      console.log(`Sending request to Gemini (${MODEL_NAME}, attempt ${attempt + 1})...`);
+      
+      const response = await ai.models.generateContent({
+        model: MODEL_NAME,
+        contents: prompt,
+        config: {
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.HIGH,
           },
-        }),
+          systemInstruction: "You are a travel expert. Always respond with raw JSON.",
+          temperature: 0.7,
+        },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      console.log('Gemini Response received:', response);
 
-        if (!text) {
-          throw new Error('GEMINI_EMPTY_RESPONSE');
+      if (response && response.text) {
+        const text = response.text;
+        const parsed = extractJSON(text);
+
+        if (parsed) {
+          // Cache the result
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
+          } catch { /* storage full, ignore */ }
+          return parsed;
         }
-
-        const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const parsed = JSON.parse(cleaned);
-
-        // Cache the result
-        try {
-          sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
-        } catch { /* storage full, ignore */ }
-
-        return parsed;
+        
+        throw new Error('GEMINI_JSON_EXTRACTION_FAILED');
       }
 
-      if (response.status === 429) {
-        console.warn(`Gemini rate limited (attempt ${attempt + 1}/${MAX_RETRIES})`);
-        if (attempt === MAX_RETRIES - 1) {
-          throw new Error('GEMINI_RATE_LIMITED');
-        }
-        continue; // retry
-      }
-
-      // Other HTTP errors — don't retry
-      throw new Error(`GEMINI_API_ERROR: ${response.status}`);
+      throw new Error('GEMINI_INVALID_RESPONSE_FORMAT');
     } catch (err) {
-      if (err.message.startsWith('GEMINI_')) throw err;
+      console.error('Gemini API Error Detail:', {
+        message: err.message,
+        status: err.status,
+        attempt: attempt + 1
+      });
+      
+      if (err.message.includes('429') || err.message.toLowerCase().includes('rate limit')) {
+        if (attempt === MAX_RETRIES - 1) throw new Error('GEMINI_RATE_LIMITED');
+        continue;
+      }
+
       if (attempt === MAX_RETRIES - 1) throw err;
-      console.warn('Gemini request error:', err.message);
     }
   }
 }

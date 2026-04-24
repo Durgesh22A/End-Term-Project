@@ -12,7 +12,10 @@ export default function AttractionCard({ attraction, index = 0 }) {
   const imgGradient = photo?.gradient;
 
   const imageStyle = imgUrl
-    ? { backgroundImage: `url(${imgUrl})` }
+    ? { 
+        backgroundImage: `url('${imgUrl}')`,
+        backgroundColor: '#1a1f2e' // Dark base while loading
+      }
     : { background: imgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' };
 
   return (

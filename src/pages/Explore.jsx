@@ -6,11 +6,10 @@ import CuisineCard from '../components/explore/CuisineCard';
 import TravelInfoPanel from '../components/explore/TravelInfoPanel';
 import SearchSkeleton from '../components/explore/SearchSkeleton';
 import { generateTravelSuggestions } from '../services/geminiApi';
-import { fetchPlacePhoto, fetchPhotosForItems } from '../services/unsplashApi';
+import { fetchPlacePhoto } from '../services/unsplashApi';
 import { popularDestinations } from '../utils/fallbackDestinations';
 import './Explore.css';
 
-// Animated placeholder texts
 const PLACEHOLDER_TEXTS = [
   'Try "Paris, France"...',
   'Try "Tokyo, Japan"...',
@@ -40,7 +39,6 @@ export default function Explore() {
     return () => clearInterval(interval);
   }, []);
 
-  // Search handler — Gemini AI only
   const handleSearch = useCallback(async (searchQuery) => {
     const q = (searchQuery || query).trim();
     if (!q) return;
@@ -51,47 +49,54 @@ export default function Explore() {
     setHeroPhoto(null);
 
     try {
-      // Generate content via Gemini AI
       const data = await generateTravelSuggestions(q);
-
-      // Fetch hero image
-      const heroPromise = fetchPlacePhoto(
-        `${data.destination_name || q} landmark landscape`
-      );
-
-      // Fetch attraction & cuisine images from Unsplash
-      const [attractionsWithPhotos, cuisineWithPhotos] = await Promise.all([
-        fetchPhotosForItems(data.top_attractions || []),
-        fetchPhotosForItems(data.local_cuisine || []),
-      ]);
-
-      const hero = await heroPromise;
-      setHeroPhoto(hero);
 
       setResult({
         ...data,
-        top_attractions: attractionsWithPhotos,
-        local_cuisine: cuisineWithPhotos,
+        top_attractions: data.top_attractions || [],
+        local_cuisine: data.local_cuisine || [],
       });
+      setLoading(false);
 
-      // Scroll to results
+      // Scroll to results immediately
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
+      }, 100);
+
+      const heroPromise = fetchPlacePhoto(data.destination_name || q);
+      heroPromise.then(hero => setHeroPhoto(hero));
+
+      const attractions = data.top_attractions || [];
+      const cuisine = data.local_cuisine || [];
+
+      attractions.forEach((item, i) => {
+        const term = item.search_term || item.name;
+        fetchPlacePhoto(term).then(photo => {
+          setResult(prev => {
+            if (!prev) return prev;
+            const updated = [...prev.top_attractions];
+            updated[i] = { ...updated[i], photo };
+            return { ...prev, top_attractions: updated };
+          });
+        }).catch(() => {});
+      });
+
+      cuisine.forEach((item, i) => {
+        const term = item.search_term || item.name;
+        fetchPlacePhoto(term).then(photo => {
+          setResult(prev => {
+            if (!prev) return prev;
+            const updated = [...prev.local_cuisine];
+            updated[i] = { ...updated[i], photo };
+            return { ...prev, local_cuisine: updated };
+          });
+        }).catch(() => {});
+      });
+
     } catch (err) {
       console.error('Explore search error:', err);
-
-      if (err.message === 'GEMINI_API_KEY_MISSING') {
-        setError('Gemini API key is not configured. Add VITE_GEMINI_API_KEY to your .env file.');
-      } else if (err.message === 'GEMINI_RATE_LIMITED') {
-        setError('API rate limit reached. Please wait a minute and try again.');
-      } else if (err.message?.includes('403')) {
-        setError('API key is invalid or restricted. Check your Gemini API key.');
-      } else {
-        setError('Failed to generate travel guide. Please try again.');
-      }
-    } finally {
       setLoading(false);
+      setError('Unable to load travel information. Please check your internet connection and try again.');
     }
   }, [query]);
 

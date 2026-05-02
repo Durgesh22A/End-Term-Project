@@ -1,11 +1,6 @@
-/**
- * Unsplash API service for fetching destination and attraction photos.
- * Falls back to curated placeholder images when the API is unavailable.
- */
-
 const UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos';
+const WIKIPEDIA_API = 'https://en.wikipedia.org/w/api.php';
 
-// Vibrant placeholder gradients as fallback when no image is available
 const PLACEHOLDER_GRADIENTS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -17,26 +12,69 @@ const PLACEHOLDER_GRADIENTS = [
   'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
 ];
 
-/**
- * Search Unsplash for photos matching a query
- * @param {string} query - Search term
- * @param {number} perPage - Number of results (default 1)
- * @returns {object|null} Photo data with urls, or null on failure
- */
-export async function searchPhotos(query, perPage = 1) {
-  const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash;
+}
 
-  if (!accessKey) {
+async function fetchWikipediaImage(searchTerm) {
+  try {
+    const searchParams = new URLSearchParams({
+      action: 'query',
+      list: 'search',
+      srsearch: searchTerm,
+      format: 'json',
+      origin: '*',
+      srlimit: 3,
+      srnamespace: 0,
+    });
+
+    const searchRes = await fetch(`${WIKIPEDIA_API}?${searchParams}`);
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json();
+
+    const results = searchData.query?.search;
+    if (!results || results.length === 0) return null;
+
+    const pageTitle = results[0].title;
+
+    const imageParams = new URLSearchParams({
+      action: 'query',
+      titles: pageTitle,
+      prop: 'pageimages',
+      format: 'json',
+      origin: '*',
+      pithumbsize: 800,
+      piprop: 'thumbnail|original',
+    });
+
+    const imageRes = await fetch(`${WIKIPEDIA_API}?${imageParams}`);
+    if (!imageRes.ok) return null;
+    const imageData = await imageRes.json();
+
+    const pages = imageData.query?.pages;
+    if (!pages) return null;
+
+    const page = Object.values(pages)[0];
+    return page?.original?.source || page?.thumbnail?.source || null;
+  } catch {
     return null;
   }
+}
 
-  // Check sessionStorage cache
+async function searchUnsplashPhotos(query, perPage = 1) {
+  const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+  if (!accessKey) return null;
+
   const cacheKey = `unsplash_${query.toLowerCase().trim()}_${perPage}`;
   const cached = sessionStorage.getItem(cacheKey);
   if (cached) {
-    try {
-      return JSON.parse(cached);
-    } catch { /* ignore */ }
+    try { return JSON.parse(cached); } catch { }
   }
 
   try {
@@ -48,88 +86,75 @@ export async function searchPhotos(query, perPage = 1) {
     });
 
     const response = await fetch(`${UNSPLASH_API_URL}?${params}`, {
-      headers: {
-        Authorization: `Client-ID ${accessKey}`,
-      },
+      headers: { Authorization: `Client-ID ${accessKey}` },
     });
 
-    if (!response.ok) {
-      console.warn(`Unsplash API error: ${response.status}`);
-      return null;
-    }
+    if (!response.ok) return null;
 
     const data = await response.json();
-
-    if (!data.results || data.results.length === 0) {
-      return null;
-    }
+    if (!data.results || data.results.length === 0) return null;
 
     const results = data.results.map(photo => ({
       id: photo.id,
       url_regular: photo.urls?.regular,
       url_small: photo.urls?.small,
-      url_thumb: photo.urls?.thumb,
       alt: photo.alt_description || query,
       photographer: photo.user?.name,
       photographer_url: photo.user?.links?.html,
     }));
 
-    // Cache results
-    try {
-      sessionStorage.setItem(cacheKey, JSON.stringify(results));
-    } catch { /* storage full */ }
+    try { sessionStorage.setItem(cacheKey, JSON.stringify(results)); } catch { }
 
     return results;
-  } catch (error) {
-    console.warn('Unsplash fetch error:', error.message);
+  } catch {
     return null;
   }
 }
 
-/**
- * Fetch a single photo for a destination or attraction
- * @param {string} searchTerm - What to search for
- * @returns {object} { url, alt, photographer, gradient }
- */
 export async function fetchPlacePhoto(searchTerm) {
-  const results = await searchPhotos(searchTerm, 1);
+  if (!searchTerm) {
+    return { url: null, gradient: PLACEHOLDER_GRADIENTS[0], isPlaceholder: true };
+  }
 
-  if (results && results.length > 0) {
+  const gradientIndex = Math.abs(hashString(searchTerm)) % PLACEHOLDER_GRADIENTS.length;
+
+  const wikiUrl = await fetchWikipediaImage(searchTerm);
+  if (wikiUrl) {
     return {
-      url: results[0].url_regular,
-      urlSmall: results[0].url_small,
-      alt: results[0].alt,
-      photographer: results[0].photographer,
-      photographerUrl: results[0].photographer_url,
+      url: wikiUrl,
+      urlSmall: wikiUrl,
+      alt: searchTerm,
+      photographer: 'Wikipedia / Wikimedia Commons',
+      photographerUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(searchTerm)}`,
+      gradient: PLACEHOLDER_GRADIENTS[gradientIndex],
       isPlaceholder: false,
     };
   }
 
-  // Fallback: Use LoremFlickr for real photos based on search term
-  // LoremFlickr works best with comma-separated tags instead of spaces
-  const tags = searchTerm.toLowerCase().replace(/\s+/g, ',');
-  const gradientIndex = Math.abs(hashString(searchTerm)) % PLACEHOLDER_GRADIENTS.length;
-  const url = `https://loremflickr.com/800/600/${tags},travel`;
-  const urlSmall = `https://loremflickr.com/400/300/${tags},travel`;
-
-  console.log(`[Photo Service] Fetching for: "${searchTerm}" | URL: ${url}`);
+  const unsplashResults = await searchUnsplashPhotos(searchTerm, 1);
+  if (unsplashResults && unsplashResults.length > 0) {
+    return {
+      url: unsplashResults[0].url_regular,
+      urlSmall: unsplashResults[0].url_small,
+      alt: unsplashResults[0].alt,
+      photographer: unsplashResults[0].photographer,
+      photographerUrl: unsplashResults[0].photographer_url,
+      gradient: PLACEHOLDER_GRADIENTS[gradientIndex],
+      isPlaceholder: false,
+    };
+  }
 
   return {
-    url,
-    urlSmall,
+    url: null,
+    urlSmall: null,
     alt: searchTerm,
-    photographer: 'LoremFlickr',
-    photographerUrl: 'https://loremflickr.com',
+    photographer: null,
+    photographerUrl: null,
     gradient: PLACEHOLDER_GRADIENTS[gradientIndex],
-    isPlaceholder: false,
+    isPlaceholder: true,
   };
 }
 
-/**
- * Fetch multiple photos for an array of items (attractions, cuisine, etc.)
- * @param {Array} items - Array of objects with a search_term or name property
- * @returns {Array} Same items with added `photo` property
- */
 export async function fetchPhotosForItems(items) {
   if (!items || items.length === 0) return [];
 
@@ -150,13 +175,6 @@ export async function fetchPhotosForItems(items) {
   }));
 }
 
-// Simple string hash for deterministic gradient selection
-function hashString(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return hash;
+export async function searchPhotos(query, perPage = 1) {
+  return searchUnsplashPhotos(query, perPage);
 }

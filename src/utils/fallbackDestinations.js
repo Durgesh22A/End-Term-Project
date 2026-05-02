@@ -1,7 +1,3 @@
-/**
- * Curated fallback destination data for when APIs are unavailable.
- * Also used as "Popular Destinations" suggestions before any search.
- */
 
 export const popularDestinations = [
   {
@@ -240,13 +236,227 @@ export const popularDestinations = [
       'Haggle at street markets — start at 50% of the quoted price.'
     ],
     safety_notes: 'Keep valuables secure in crowded areas. Use Uber/Ola for safe, metered rides.'
-  }
+  },
+  // ─── INDIA ────────────────────────────────────────────────────────────────
+  {
+    id: 'patna',
+    name: 'Patna',
+    country: 'India',
+    tagline: 'Ancient Capital on the Ganges',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1598091383021-15ddea10925d?w=800&q=80',
+    overview: 'Patna, the capital of Bihar, is one of the oldest continuously inhabited places in the world, dating back 2,500 years. It sits on the banks of the Ganges and is a major pilgrimage and historical tourism hub.',
+    top_attractions: [
+      { name: 'Golghar', description: 'A massive beehive-shaped granary built in 1786 offering panoramic views of the Ganges from its top.', visit_time: '1-2 hours', entry_fee: '₹20', search_term: 'Golghar Patna' },
+      { name: 'Patna Museum', description: 'One of the oldest museums in India housing ancient sculptures, Mauryan artifacts, and the famous Didarganj Yakshi statue.', visit_time: '2-3 hours', entry_fee: '₹30', search_term: 'Patna Museum' },
+      { name: 'Takht Sri Patna Sahib', description: 'One of the five Takhts of Sikhism, this is the birthplace of Guru Gobind Singh Ji and a major pilgrimage site.', visit_time: '1-2 hours', entry_fee: 'Free', search_term: 'Takht Sri Patna Sahib' },
+      { name: 'Bihar Museum', description: 'A world-class modern museum showcasing the rich archaeological and artistic heritage of Bihar with stunning exhibits.', visit_time: '2-3 hours', entry_fee: '₹100', search_term: 'Bihar Museum Patna' },
+      { name: 'Buddha Smriti Park', description: 'A serene park on the banks of the Ganges featuring Buddhist sculptures, a stupa, and peaceful walking paths.', visit_time: '1 hour', entry_fee: '₹20', search_term: 'Buddha Smriti Park Patna' },
+    ],
+    local_cuisine: [
+      { name: 'Litti Chokha', description: 'Roasted wheat balls stuffed with spiced sattu, served with mashed potatoes and brinjal — Bihar\'s iconic dish.', price_range: '₹50-100', search_term: 'Litti Chokha' },
+      { name: 'Sattu Paratha', description: 'Flatbread stuffed with roasted gram flour, a hearty staple of Bihar eaten for breakfast and lunch.', price_range: '₹40-80', search_term: 'Sattu Paratha' },
+      { name: 'Anarsa', description: 'A traditional sweet made from rice flour and sesame seeds, popular during festivals in Bihar.', price_range: '₹30-80', search_term: 'Anarsa sweet Bihar' },
+      { name: 'Khaja', description: 'A crispy, multi-layered sweet pastry that is a staple delicacy in the local markets of Bihar.', price_range: '₹30-70', search_term: 'Khaja sweet Bihar' },
+    ],
+    budget_estimate: { budget: '₹800-1200/day', moderate: '₹2000-3500/day', luxury: '₹6000+/day', currency: 'INR' },
+    best_time: 'October to March for pleasant weather; avoid the hot summers (April–June) and the heavy monsoon (July–September).',
+    culture_tips: [
+      'Dress modestly when visiting temples and religious sites.',
+      'Remove shoes before entering any place of worship.',
+      'Chhath Puja in October/November is the biggest festival — the city comes alive.',
+      'Use auto-rickshaws or app-based cabs for getting around the city safely.'
+    ],
+    safety_notes: 'Exercise general caution in crowded markets and keep valuables secure. Use Ola or Uber for reliable transport.'
+  },
+  {
+    id: 'gaya',
+    name: 'Gaya',
+    country: 'India',
+    tagline: 'Eternal City of Moksha and Buddha',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1570618414275-6e5d1e15ba21?w=800&q=80',
+    overview: 'Gaya is one of India\'s most sacred cities, revered by Hindus for Pitru Paksha rituals on the Falgu River and by Buddhists as the site where Buddha attained enlightenment at nearby Bodh Gaya.',
+    top_attractions: [
+      { name: 'Mahabodhi Temple, Bodh Gaya', description: 'UNESCO World Heritage Site — the most sacred Buddhist site in the world, built where the Buddha attained enlightenment under the Bodhi Tree.', visit_time: '2-3 hours', entry_fee: 'Free', search_term: 'Mahabodhi Temple Bodh Gaya' },
+      { name: 'Vishnupad Temple', description: 'Ancient Hindu temple on the banks of Falgu River with the footprint of Lord Vishnu enshrined within, a key site for Hindu pilgrimages.', visit_time: '1-2 hours', entry_fee: 'Free', search_term: 'Vishnupad Temple Gaya' },
+      { name: 'The Bodhi Tree', description: 'A direct descendant of the original tree under which Siddhartha Gautama attained Buddhahood, located within the Mahabodhi Temple complex.', visit_time: '1 hour', entry_fee: 'Free', search_term: 'Bodhi Tree Bodh Gaya' },
+      { name: 'Dungeshwari Cave Temples', description: 'Cave temples in the hills where Buddha meditated before his enlightenment, also known as Mahakala Caves, offering serene mountain views.', visit_time: '2 hours', entry_fee: '₹10', search_term: 'Dungeshwari Cave Temples Gaya' },
+      { name: 'Thai Monastery, Bodh Gaya', description: 'Beautifully ornate Thai Buddhist monastery featuring a stunning golden Buddha statue and traditional Thai architecture.', visit_time: '1 hour', entry_fee: 'Free', search_term: 'Thai Monastery Bodh Gaya' },
+    ],
+    local_cuisine: [
+      { name: 'Litti Chokha', description: 'Bihar\'s most iconic dish — smoky roasted wheat balls with spiced sattu filling, served with mashed vegetable sides.', price_range: '₹50-100', search_term: 'Litti Chokha' },
+      { name: 'Tilkut', description: 'Gaya\'s most famous sweet — a hard candy made from sesame seeds and sugar, sold all over the city and a prized souvenir.', price_range: '₹80-200/kg', search_term: 'Tilkut Gaya sweet' },
+      { name: 'Tehri', description: 'A fragrant yellow rice dish cooked with vegetables and mild spices, a popular comfort meal in Bihar.', price_range: '₹40-80', search_term: 'Tehri rice dish Bihar' },
+      { name: 'Malpua', description: 'Sweet fried pancakes dipped in sugar syrup, a popular dessert in Gaya especially during festivals.', price_range: '₹30-60', search_term: 'Malpua sweet Indian' },
+    ],
+    budget_estimate: { budget: '₹600-1000/day', moderate: '₹1500-2500/day', luxury: '₹5000+/day', currency: 'INR' },
+    best_time: 'October to March is ideal; Pitru Paksha (Sep–Oct) draws millions of pilgrims to the Falgu River.',
+    culture_tips: [
+      'Dress very modestly — Gaya is deeply religious and conservative.',
+      'Remove shoes outside all temples and monasteries.',
+      'Non-Hindus are generally not permitted inside the inner sanctum of Vishnupad Temple.',
+      'Pitru Paksha is the most auspicious time for Hindu rituals here — book accommodation well in advance.'
+    ],
+    safety_notes: 'Generally safe for tourists. Be respectful of religious customs. Hire a local guide for navigating the pilgrimage sites.'
+  },
+  {
+    id: 'varanasi',
+    name: 'Varanasi',
+    country: 'India',
+    tagline: 'The Spiritual Soul of India',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1561361058-c24e22f7f0f5?w=800&q=80',
+    overview: 'Varanasi, one of the world\'s oldest living cities, is Hinduism\'s holiest site on the Ganges River. Its ancient ghats, eternal flame ceremonies, and labyrinthine lanes create an overwhelming spiritual experience unlike anywhere else.',
+    top_attractions: [
+      { name: 'Dashashwamedh Ghat', description: 'The main and most spectacular ghat of Varanasi, famous for the nightly Ganga Aarti fire ceremony that draws thousands.', visit_time: '1-2 hours', entry_fee: 'Free', search_term: 'Dashashwamedh Ghat Varanasi' },
+      { name: 'Kashi Vishwanath Temple', description: 'One of the most sacred Hindu temples, dedicated to Lord Shiva and located in the heart of the city\'s old lanes.', visit_time: '1-2 hours', entry_fee: 'Free', search_term: 'Kashi Vishwanath Temple Varanasi' },
+      { name: 'Sarnath', description: 'Site where Buddha gave his first sermon after enlightenment — home to the magnificent Dhamek Stupa and a fine museum.', visit_time: '2-3 hours', entry_fee: '₹35', search_term: 'Dhamek Stupa Sarnath' },
+      { name: 'Manikarnika Ghat', description: 'The most sacred Hindu cremation ghat where funeral pyres burn 24/7 — a profound, deeply moving site of Hindu belief.', visit_time: '1 hour', entry_fee: 'Free', search_term: 'Manikarnika Ghat Varanasi' },
+      { name: 'Ramnagar Fort', description: 'A 17th-century fort across the Ganges from Varanasi, home to a remarkable museum of vintage cars, palanquins, and royal artefacts.', visit_time: '2 hours', entry_fee: '₹15', search_term: 'Ramnagar Fort Varanasi' },
+    ],
+    local_cuisine: [
+      { name: 'Banarasi Chaat', description: 'Famous tangy and spicy street food — try tamatar chaat and dahi puri from vendors on the ghats.', price_range: '₹30-80', search_term: 'Banarasi chaat street food' },
+      { name: 'Malaiyo', description: 'A delicate winter dessert made from whipped saffron milk foam — a Varanasi specialty only found in early mornings.', price_range: '₹30-50', search_term: 'Malaiyo Varanasi sweet' },
+      { name: 'Banarasi Paan', description: 'Varanasi\'s famous betel leaf stuffed with sweet fillings — an unmissable experience to end any meal here.', price_range: '₹10-30', search_term: 'Banarasi paan' },
+      { name: 'Kachori Sabzi', description: 'Crispy fried kachoris served with spicy potato curry — the ultimate Varanasi breakfast at the ghats.', price_range: '₹30-60', search_term: 'Kachori sabzi breakfast Indian' },
+    ],
+    budget_estimate: { budget: '₹800-1200/day', moderate: '₹2000-4000/day', luxury: '₹8000+/day', currency: 'INR' },
+    best_time: 'October to March for comfortable weather. Dev Deepawali in November lights the entire ghats with thousands of lamps.',
+    culture_tips: [
+      'Never photograph cremation ceremonies at Manikarnika Ghat without explicit permission.',
+      'Take boat rides at dawn for the most magical views of the ghats.',
+      'Dress modestly — long sleeves and covering legs is respectful and expected.',
+      'Hire a guide to navigate the narrow galis (lanes) of the old city.'
+    ],
+    safety_notes: 'Safe for tourists but watch for touts near the ghats. Negotiate boat ride prices beforehand and always use registered guides.'
+  },
+  {
+    id: 'delhi',
+    name: 'Delhi',
+    country: 'India',
+    tagline: 'Where Ancient Empires Meet Modern India',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80',
+    overview: 'Delhi, India\'s capital territory, is a city of extraordinary contrasts where Mughal grandeur, British colonial architecture, and 21st-century urban life collide. Eight cities have been built here — each leaving its mark on this layered, magnificent metropolis.',
+    top_attractions: [
+      { name: 'Red Fort', description: 'Magnificent UNESCO-listed Mughal fortress complex on the banks of the Yamuna, the seat of Mughal power for 200 years.', visit_time: '2-3 hours', entry_fee: '₹35', search_term: 'Red Fort Delhi' },
+      { name: 'Qutub Minar', description: 'India\'s tallest minaret and a UNESCO World Heritage Site, a masterpiece of Indo-Islamic architecture from the 12th century.', visit_time: '1-2 hours', entry_fee: '₹30', search_term: 'Qutub Minar Delhi' },
+      { name: 'Humayun\'s Tomb', description: 'A stunning garden tomb that inspired the design of the Taj Mahal — serene, symmetrical, and remarkably preserved.', visit_time: '1-2 hours', entry_fee: '₹35', search_term: 'Humayun Tomb Delhi' },
+      { name: 'India Gate', description: 'Iconic war memorial at the heart of New Delhi\'s ceremonial boulevard, surrounded by lawns perfect for an evening stroll.', visit_time: '1 hour', entry_fee: 'Free', search_term: 'India Gate New Delhi' },
+      { name: 'Chandni Chowk', description: 'Old Delhi\'s chaotic and vibrant 17th-century market street — a sensory overload of food stalls, spice shops, and textile stores.', visit_time: '2-3 hours', entry_fee: 'Free', search_term: 'Chandni Chowk Delhi market' },
+    ],
+    local_cuisine: [
+      { name: 'Chole Bhature', description: 'Fluffy deep-fried bread with spicy chickpea curry — Delhi\'s most beloved breakfast, best at Sitaram Diwan Chand.', price_range: '₹80-150', search_term: 'Chole Bhature Delhi' },
+      { name: 'Butter Chicken', description: 'The world-famous curry was invented in Delhi — rich, creamy tomato-based chicken gravy best at Moti Mahal.', price_range: '₹200-400', search_term: 'Butter Chicken Indian food' },
+      { name: 'Paratha at Paranthe Wali Gali', description: 'Stuffed flatbreads from the famous 150-year-old lane in Chandni Chowk with over 20 varieties of fillings.', price_range: '₹80-150', search_term: 'Parantha Wali Gali Delhi' },
+      { name: 'Delhi Chaat', description: 'Gol gappas, papdi chaat, and aloo tikki from street vendors — the unofficial cuisine of the city.', price_range: '₹30-80', search_term: 'Delhi street food chaat' },
+    ],
+    budget_estimate: { budget: '₹1000-1800/day', moderate: '₹3000-5000/day', luxury: '₹10000+/day', currency: 'INR' },
+    best_time: 'October to March for pleasant weather (15–25°C). Avoid May–June (45°C+) and monsoon (July–August).',
+    culture_tips: [
+      'Use Delhi Metro — it\'s fast, cheap, and connects all major sights.',
+      'Haggle in markets like Chandni Chowk but be firm and polite.',
+      'Carry cash — many smaller vendors and autos don\'t accept cards.',
+      'Always use Ola/Uber or prepaid taxis rather than unmetered autos.'
+    ],
+    safety_notes: 'Generally safe in tourist areas; women should be cautious in isolated areas after dark. Keep bags zipped in crowded markets.'
+  },
+  {
+    id: 'agra',
+    name: 'Agra',
+    country: 'India',
+    tagline: 'Home of the World\'s Greatest Love Story',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80',
+    overview: 'Agra is home to three UNESCO World Heritage Sites including the incomparable Taj Mahal — the world\'s greatest monument to love. Built by Mughal Emperor Shah Jahan, this marble masterpiece draws millions from across the globe.',
+    top_attractions: [
+      { name: 'Taj Mahal', description: 'The world\'s most iconic monument — a perfect white marble mausoleum built by Shah Jahan for his beloved wife Mumtaz Mahal. Best seen at sunrise.', visit_time: '2-3 hours', entry_fee: '₹1100', search_term: 'Taj Mahal Agra' },
+      { name: 'Agra Fort', description: 'A UNESCO World Heritage Site — this massive red sandstone Mughal fort served as the main residence of emperors and houses stunning palaces within.', visit_time: '2 hours', entry_fee: '₹650', search_term: 'Agra Fort' },
+      { name: 'Fatehpur Sikri', description: 'A perfectly preserved ghost city built by Akbar and abandoned 14 years later — a remarkable UNESCO-listed architectural wonder.', visit_time: '3 hours', entry_fee: '₹610', search_term: 'Fatehpur Sikri' },
+      { name: 'Mehtab Bagh', description: 'A Mughal garden complex across the Yamuna offering a spectacular and uncrowded view of the Taj Mahal, especially at sunset.', visit_time: '1 hour', entry_fee: '₹200', search_term: 'Mehtab Bagh Agra' },
+      { name: 'Jama Masjid Agra', description: 'One of the largest mosques in India, built by Shah Jahan\'s daughter, featuring stunning red sandstone and marble work.', visit_time: '45 min', entry_fee: 'Free', search_term: 'Jama Masjid Agra' },
+    ],
+    local_cuisine: [
+      { name: 'Agra Petha', description: 'Agra\'s most famous sweet — a translucent candy made from ash gourd in various flavors, available in every shop in the city.', price_range: '₹100-300/kg', search_term: 'Agra Petha sweet' },
+      { name: 'Bedai Sabzi', description: 'Crispy fried bread served with spicy potato curry — Agra\'s quintessential morning street food breakfast.', price_range: '₹30-60', search_term: 'Bedai Sabzi Agra breakfast' },
+      { name: 'Mughlai Biryani', description: 'Aromatic slow-cooked rice with tender meat in authentic Mughal spices — a legacy of the imperial kitchens of Agra.', price_range: '₹200-400', search_term: 'Mughlai Biryani' },
+      { name: 'Dal Makhani', description: 'Slow-cooked black lentils in butter and cream — a rich, indulgent dish that is a staple of this region\'s cuisine.', price_range: '₹150-250', search_term: 'Dal Makhani Indian food' },
+    ],
+    budget_estimate: { budget: '₹800-1500/day', moderate: '₹2500-5000/day', luxury: '₹10000+/day', currency: 'INR' },
+    best_time: 'October to March for comfortable weather. Visit the Taj Mahal at sunrise — it\'s less crowded and the light is magical.',
+    culture_tips: [
+      'Book Taj Mahal tickets online in advance to skip long queues.',
+      'Hire a government-approved guide at the gate for the best experience.',
+      'Photography is allowed everywhere inside Taj Mahal except the inner mausoleum.',
+      'Full moon nights offer special evening viewing of the Taj — book separately.'
+    ],
+    safety_notes: 'Beware of persistent touts and unofficial guides near the Taj Mahal. Use only government-authorized taxis or app-based cabs.'
+  },
+  {
+    id: 'jaipur',
+    name: 'Jaipur',
+    country: 'India',
+    tagline: 'The Pink City of Palaces and Forts',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1599661046289-e31897846e45?w=800&q=80',
+    overview: 'Jaipur, the capital of Rajasthan, is a stunning walled city known for its magnificent forts, ornate palaces, and vibrant bazaars. Its distinctive pink-colored buildings earned it the nickname "Pink City" and it forms the golden triangle with Delhi and Agra.',
+    top_attractions: [
+      { name: 'Amber Fort', description: 'A breathtaking hilltop fort with ornate mirrored halls, elephant rides, and panoramic views over the Aravalli hills.', visit_time: '2-3 hours', entry_fee: '₹500', search_term: 'Amber Fort Jaipur' },
+      { name: 'Hawa Mahal', description: 'The iconic Palace of Winds — a five-story pink sandstone facade with 953 small windows for royal ladies to view street festivals.', visit_time: '1 hour', entry_fee: '₹50', search_term: 'Hawa Mahal Jaipur' },
+      { name: 'City Palace', description: 'A magnificent royal complex still partially occupied by the Jaipur royal family, housing a stunning museum of royal artifacts.', visit_time: '2 hours', entry_fee: '₹500', search_term: 'City Palace Jaipur' },
+      { name: 'Jantar Mantar', description: 'UNESCO-listed astronomical observatory built in 1724 with giant instruments that can measure time, predict eclipses, and track celestial bodies.', visit_time: '1 hour', entry_fee: '₹50', search_term: 'Jantar Mantar Jaipur' },
+      { name: 'Nahargarh Fort', description: 'A hilltop fort with spectacular sunset panoramas over the Pink City — a favorite spot for both history lovers and photographers.', visit_time: '1-2 hours', entry_fee: '₹50', search_term: 'Nahargarh Fort Jaipur' },
+    ],
+    local_cuisine: [
+      { name: 'Dal Baati Churma', description: 'Rajasthan\'s most iconic dish — baked wheat balls dipped in ghee served with lentil curry and sweet crushed wheat dessert.', price_range: '₹120-250', search_term: 'Dal Baati Churma Rajasthan' },
+      { name: 'Laal Maas', description: 'A fiery red Rajasthani mutton curry cooked with dried chilies — a bold, rich dish for those who love heat.', price_range: '₹250-450', search_term: 'Laal Maas Rajasthani mutton curry' },
+      { name: 'Pyaaz Kachori', description: 'Crispy deep-fried pastries filled with spiced onion — Jaipur\'s most beloved street snack, best at Rawat Mishtan Bhandar.', price_range: '₹15-30', search_term: 'Pyaaz Kachori Jaipur' },
+      { name: 'Ghevar', description: 'A disc-shaped Rajasthani sweet made from flour and soaked in sugar syrup, especially popular during the Teej and Gangaur festivals.', price_range: '₹100-300', search_term: 'Ghevar Rajasthani sweet' },
+    ],
+    budget_estimate: { budget: '₹900-1500/day', moderate: '₹2500-5000/day', luxury: '₹10000+/day', currency: 'INR' },
+    best_time: 'October to March. The Jaipur Literature Festival (January) and Holi celebrations are particularly spectacular.',
+    culture_tips: [
+      'Bargain hard in Johari Bazaar for gems and Bapu Bazaar for textiles — prices are negotiable.',
+      'Hire a local guide at Amber Fort for the rich stories behind every room.',
+      'Dress conservatively when visiting temples and religious sites.',
+      'An auto-rickshaw is the best way to navigate the old walled city.'
+    ],
+    safety_notes: 'Very safe for tourists. Beware of gem shop touts who may try to offer "deals" and ask you to carry items abroad — decline politely.'
+  },
+  {
+    id: 'goa',
+    name: 'Goa',
+    country: 'India',
+    tagline: 'Sun, Sand, Spice and Soul',
+    emoji: '🇮🇳',
+    image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=80',
+    overview: 'Goa, India\'s smallest state, is a paradise of golden beaches, Portuguese colonial churches, spice plantations, and vibrant nightlife. Its unique Indo-Portuguese culture gives it a distinct character unlike anywhere else in India.',
+    top_attractions: [
+      { name: 'Baga Beach', description: 'Goa\'s most popular beach, buzzing with beach shacks, water sports, parasailing, and legendary sunset parties.', visit_time: '2-4 hours', entry_fee: 'Free', search_term: 'Baga Beach Goa' },
+      { name: 'Basilica of Bom Jesus', description: 'UNESCO World Heritage Site — one of the best examples of baroque architecture in India, housing the remains of St. Francis Xavier.', visit_time: '1 hour', entry_fee: 'Free', search_term: 'Basilica of Bom Jesus Goa' },
+      { name: 'Dudhsagar Falls', description: 'One of India\'s tallest waterfalls cascading 310m through a lush jungle — accessible by jeep safari through the Bhagwan Mahavir Wildlife Sanctuary.', visit_time: '4-5 hours', entry_fee: '₹400 (jeep)', search_term: 'Dudhsagar Falls Goa' },
+      { name: 'Anjuna Flea Market', description: 'Famous Wednesday market with hundreds of stalls selling antiques, spices, jewellery, and clothing in a festive, hippie atmosphere.', visit_time: '2-3 hours', entry_fee: 'Free', search_term: 'Anjuna Flea Market Goa' },
+      { name: 'Palolem Beach', description: 'A crescent-shaped beach in south Goa — calmer, cleaner, and more laid-back than the north, with beautiful hut stays along the shore.', visit_time: '2-4 hours', entry_fee: 'Free', search_term: 'Palolem Beach Goa' },
+    ],
+    local_cuisine: [
+      { name: 'Fish Curry Rice', description: 'Goa\'s ultimate comfort food — a tangy coconut milk and kokum-based fish curry served with steamed rice and a side of pickle.', price_range: '₹150-300', search_term: 'Goan fish curry rice' },
+      { name: 'Prawn Balchão', description: 'A fiery, tangy prawn pickle curry made with spiced vinegar — a bold flavour that defines coastal Goan cuisine.', price_range: '₹200-350', search_term: 'Prawn Balchao Goa' },
+      { name: 'Bebinca', description: 'Goa\'s beloved 7-layer coconut dessert made with coconut milk, eggs, and ghee — the queen of Goan sweets.', price_range: '₹100-200', search_term: 'Bebinca Goan dessert' },
+      { name: 'Chorizo Pav', description: 'Spicy Goan pork sausages served in a soft bread roll — a Portuguese-influenced street food staple found at every morning market.', price_range: '₹60-120', search_term: 'Goan Chorizo Pav' },
+    ],
+    budget_estimate: { budget: '₹1000-2000/day', moderate: '₹3000-6000/day', luxury: '₹12000+/day', currency: 'INR' },
+    best_time: 'November to February for perfect beach weather. Avoid June–September (heavy monsoon). Sunburn Fest (December) for music lovers.',
+    culture_tips: [
+      'Renting a scooter is the best way to explore the coast at your own pace.',
+      'Drinking in public is fine at licensed beach shacks and restaurants.',
+      'North Goa is lively and party-oriented; South Goa is quieter and scenic.',
+      'Always carry sunscreen, a hat, and stay hydrated in the beach heat.'
+    ],
+    safety_notes: 'Generally very safe. Be cautious with rented scooters — helmet is mandatory. Be wary of valuables on crowded beaches.'
+  },
 ];
 
-/**
- * Find a fallback destination by name (fuzzy match).
- * If not found, generates a generic template so ANY destination works.
- */
 export function findFallbackDestination(query) {
   if (!query) return null;
   const q = query.toLowerCase().trim();

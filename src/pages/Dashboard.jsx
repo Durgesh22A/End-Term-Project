@@ -8,11 +8,14 @@ import TripCard from '../components/trip/TripCard';
 import { PageLoader } from '../components/common/Loader';
 import { getCurrencySymbol } from '../utils/formatCurrency';
 import { getTripStatus } from '../utils/constants';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { trips, loading } = useTrips();
+  const navigate = useNavigate();
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -82,9 +85,13 @@ export default function Dashboard() {
           <div className="dashboard-empty-icon">✈️</div>
           <h2>Start Your Journey</h2>
           <p>Plan your first trip and let AI create a personalized itinerary for your adventure.</p>
-          <a href="/trips" className="btn btn-primary btn-lg" style={{ marginTop: '1rem' }}>
+          <button
+            onClick={() => navigate('/trips')}
+            className="btn btn-primary btn-lg"
+            style={{ marginTop: '1rem' }}
+          >
             Create Your First Trip
-          </a>
+          </button>
         </div>
       ) : (
         <div className="dashboard-grid">
@@ -92,7 +99,7 @@ export default function Dashboard() {
             <h2 className="section-title">Recent Trips</h2>
             <div className="dashboard-trips stagger-children">
               {trips.slice(0, 3).map((trip) => (
-                <TripCard key={trip.id} trip={trip} totalSpent={0} />
+                <TripCard key={trip.id} trip={trip} />
               ))}
             </div>
           </div>

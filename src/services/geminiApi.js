@@ -1,164 +1,188 @@
-/**
- * Google Gemini AI API service for generating travel destination content.
- * Uses the @google/genai SDK with Gemma 4 26B model and High Thinking level.
- */
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
+import { popularDestinations, findFallbackDestination } from "../utils/fallbackDestinations";
 
-// Initialize the SDK with your API key from environment variables
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const ai = new GoogleGenAI({ apiKey });
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const CACHE_VERSION = "v6";
 
-// Model ID from user snippet
-const MODEL_NAME = "gemma-4-26b-a4b-it";
-
-/**
- * Robustly extract JSON from a string that might contain mixed content (like thinking thoughts)
- */
-function extractJSON(text) {
-  if (!text) return null;
+(function clearOldCache() {
   try {
-    // Try cleaning standard markdown blocks first
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch (err) {
-    // If that fails, try finding the first '{' and last '}'
-    try {
-      const start = text.indexOf('{');
-      const end = text.lastIndexOf('}');
-      if (start !== -1 && end !== -1) {
-        const jsonStr = text.substring(start, end + 1);
-        return JSON.parse(jsonStr);
+    if (localStorage.getItem('explore_cache_version') !== CACHE_VERSION) {
+      for (const k of Object.keys(localStorage)) {
+        if (k.startsWith('explore_')) localStorage.removeItem(k);
       }
-    } catch (innerErr) {
-      console.error('Failed to extract JSON from segment:', text.substring(0, 100) + '...');
+      localStorage.setItem('explore_cache_version', CACHE_VERSION);
     }
-    return null;
+  } catch { }
+})();
+
+function getCached(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { data, timestamp } = JSON.parse(raw);
+    if (Date.now() - timestamp > CACHE_TTL_MS) { localStorage.removeItem(key); return null; }
+    return data;
+  } catch { return null; }
+}
+
+function setCached(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    for (const k of Object.keys(localStorage)) { if (k.startsWith('explore_')) localStorage.removeItem(k); }
+    try { localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() })); } catch { }
   }
 }
 
-/**
- * Generate travel suggestions for a destination using Gemini AI
- * @param {string} destination - City or country name
- * @returns {object} Structured travel data
- * @throws {Error} If API key is missing or all retries fail
- */
+function stripHtml(str = '') {
+  return str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function toTitleCase(str) {
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function findKnownDestination(query) {
+  const q = query.toLowerCase().trim();
+  return popularDestinations.find(d =>
+    d.name.toLowerCase() === q ||
+    d.id === q.replace(/\s+/g, '-') ||
+    d.name.toLowerCase().startsWith(q) ||
+    q.startsWith(d.name.toLowerCase())
+  ) || null;
+}
+
+async function buildGuideFromWikipedia(destination) {
+  const displayName = toTitleCase(destination.trim());
+
+  const signal = AbortSignal.timeout(8000);
+
+  const [summaryResult, attractionResult, cuisineResult] = await Promise.allSettled([
+    fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(destination)}`,
+      { signal }
+    ).then(r => r.ok ? r.json() : null),
+    fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(destination + ' tourist attraction temple museum fort palace garden')}&format=json&origin=*&srlimit=8`,
+      { signal }
+    ).then(r => r.ok ? r.json() : null),
+    fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(destination + ' cuisine food dish recipe local traditional')}&format=json&origin=*&srlimit=6`,
+      { signal }
+    ).then(r => r.ok ? r.json() : null),
+  ]);
+
+  let overview = `${displayName} is a remarkable destination with a rich cultural heritage, unique local traditions, and attractions that captivate every kind of traveler.`;
+  let country = '';
+
+  const summary = summaryResult.status === 'fulfilled' ? summaryResult.value : null;
+  if (summary?.extract) {
+    const sentences = summary.extract.replace(/\n/g, ' ').split(/(?<=[.!?])\s+/);
+    overview = sentences.slice(0, 2).join(' ').trim();
+    if (!overview.endsWith('.')) overview += '.';
+  }
+  if (summary?.description) {
+    country = summary.description.split(',').map(s => s.trim()).pop() || '';
+  }
+
+  const attractionData = attractionResult.status === 'fulfilled' ? attractionResult.value : null;
+  const rawAttractions = (attractionData?.query?.search || [])
+    .filter(r => r.title.toLowerCase() !== destination.toLowerCase())
+    .slice(0, 5);
+
+  const GENERIC_ATTRACTIONS = [
+    { name: `${displayName} Old Town`, description: `The historic heart of ${displayName} with traditional architecture, cultural heritage, and bustling local life.`, visit_time: '2-3 hours', entry_fee: 'Free' },
+    { name: `${displayName} Museum`, description: `The main city museum showcasing the history, arts, and archaeological heritage of the ${displayName} region.`, visit_time: '2 hours', entry_fee: 'Varies' },
+    { name: `${displayName} Local Market`, description: `A vibrant market where you can experience local life, pick up handicrafts, and taste street food.`, visit_time: '1-2 hours', entry_fee: 'Free' },
+    { name: `${displayName} Place of Worship`, description: `An important religious and cultural site, offering a glimpse into the spiritual heart of the community.`, visit_time: '1 hour', entry_fee: 'Free' },
+    { name: `${displayName} Scenic Viewpoint`, description: `A beautiful vantage point or natural area offering panoramic views of the surrounding landscape.`, visit_time: '1-2 hours', entry_fee: 'Free' },
+  ];
+
+  const top_attractions = rawAttractions.map(r => ({
+    name: r.title,
+    description: stripHtml(r.snippet).substring(0, 160).trim().replace(/\.\.\.$/, '') + '.',
+    visit_time: '1-3 hours',
+    entry_fee: 'Varies',
+    search_term: r.title,
+  }));
+
+  while (top_attractions.length < 5) {
+    const g = GENERIC_ATTRACTIONS[top_attractions.length];
+    top_attractions.push({ ...g, search_term: g.name });
+  }
+
+  const cuisineData = cuisineResult.status === 'fulfilled' ? cuisineResult.value : null;
+  const rawCuisine = (cuisineData?.query?.search || [])
+    .filter(r => r.title.toLowerCase() !== destination.toLowerCase())
+    .slice(0, 4);
+
+  const GENERIC_CUISINE = [
+    { name: `${displayName} Signature Dish`, description: `A traditional recipe unique to the ${displayName} region, made with local ingredients and age-old techniques.`, price_range: 'Local rates' },
+    { name: 'Street Food Snacks', description: `Quick, flavorful bites from roadside stalls — a delicious window into everyday local food culture.`, price_range: 'Budget-friendly' },
+    { name: 'Traditional Dessert', description: `A beloved local sweet made during festivals and celebrations, often enjoyed with tea or coffee.`, price_range: 'Budget-friendly' },
+    { name: 'Regional Specialty', description: `A dish or drink that defines the culinary identity of this region, often found only here.`, price_range: 'Local rates' },
+  ];
+
+  const local_cuisine = rawCuisine.map(r => ({
+    name: r.title,
+    description: stripHtml(r.snippet).substring(0, 130).trim().replace(/\.\.\.$/, '') + '.',
+    price_range: 'Varies',
+    search_term: r.title,
+  }));
+
+  while (local_cuisine.length < 4) {
+    const g = GENERIC_CUISINE[local_cuisine.length];
+    local_cuisine.push({ ...g, search_term: g.name });
+  }
+
+  return {
+    destination_name: displayName,
+    country: country || 'World',
+    tagline: `Discover the heart and soul of ${displayName}`,
+    overview,
+    top_attractions,
+    local_cuisine,
+    budget_estimate: {
+      budget: 'Budget options available',
+      moderate: 'Mid-range comfort',
+      luxury: 'Premium experiences',
+      currency: 'Local currency',
+    },
+    best_time: 'Spring (March–May) and autumn (September–November) are generally the best months to visit most destinations worldwide.',
+    culture_tips: [
+      'Learn a few basic greetings in the local language — it goes a long way.',
+      'Research local dress codes, especially for religious sites.',
+      'Carry some local cash as smaller vendors may not accept cards.',
+      'Respect local customs and traditions, particularly during festivals.',
+    ],
+    safety_notes: `Exercise standard travel precautions in ${displayName}: keep valuables secure, use registered transport, and stay aware of your surroundings.`,
+  };
+}
+
 export async function generateTravelSuggestions(destination) {
-  if (!apiKey) {
-    console.error('Gemini API Error: Missing VITE_GEMINI_API_KEY');
-    throw new Error('GEMINI_API_KEY_MISSING');
+  if (!destination?.trim()) throw new Error('EMPTY_DESTINATION');
+
+  const cacheKey = `explore_${destination.toLowerCase().trim().replace(/\s+/g, '_')}`;
+
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  const known = findKnownDestination(destination);
+  if (known) {
+    setCached(cacheKey, known);
+    return known;
   }
 
-  // Check sessionStorage cache first
-  const cacheKey = `explore_${destination.toLowerCase().trim()}`;
-  const cached = sessionStorage.getItem(cacheKey);
-  if (cached) {
-    try {
-      return JSON.parse(cached);
-    } catch { /* ignore invalid cache */ }
+  try {
+    const guide = await buildGuideFromWikipedia(destination);
+    if (guide) {
+      setCached(cacheKey, guide);
+      return guide;
+    }
+  } catch (err) {
+    console.warn('[Travel] Wikipedia failed:', err.message);
   }
 
-  const prompt = `You are an expert travel guide. Generate comprehensive travel information for "${destination}".
-
-Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, just raw JSON):
-
-{
-  "destination_name": "Full official name of the place",
-  "country": "Country name",
-  "tagline": "A catchy 5-8 word description of the destination vibe",
-  "overview": "2-3 sentence engaging overview of the destination highlighting what makes it special",
-  "top_attractions": [
-    {
-      "name": "Exact name of the attraction",
-      "description": "2-3 sentence description: why it's special, what to see, and what makes it unique",
-      "visit_time": "Recommended duration (e.g., '2-3 hours')",
-      "entry_fee": "Entry fee with currency symbol (e.g., '$15' or 'Free')",
-      "search_term": "Best search term to find a photo of this place on Unsplash"
-    }
-  ],
-  "local_cuisine": [
-    {
-      "name": "Dish name",
-      "description": "What makes this dish special and where to find it",
-      "price_range": "Price range with currency (e.g., '$5-10')",
-      "search_term": "Best search term to find a photo of this dish"
-    }
-  ],
-  "budget_estimate": {
-    "budget": "Daily budget for budget travelers (e.g., '$30-50/day')",
-    "moderate": "Daily budget for moderate travelers",
-    "luxury": "Daily budget for luxury travelers",
-    "currency": "Local currency code (e.g., 'USD', 'EUR')"
-  },
-  "best_time": "Best months to visit and why, in 1-2 sentences",
-  "culture_tips": ["tip 1", "tip 2", "tip 3", "tip 4"],
-  "safety_notes": "One paragraph about safety considerations"
+  return findFallbackDestination(destination);
 }
 
-Requirements:
-- Include exactly 5 top attractions (the most iconic and must-visit ones)
-- Include exactly 4 local cuisine items (most famous local dishes)
-- Include exactly 4 culture tips
-- All prices should include the local currency symbol
-- Be factually accurate with real places and real prices
-- The search_term should be specific enough to find relevant photos (e.g., "Eiffel Tower Paris" not just "tower")`;
-
-  // Retry logic with exponential backoff
-  const MAX_RETRIES = 3;
-  const RETRY_DELAYS = [2000, 8000, 20000];
-
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    if (attempt > 0) {
-      const delay = RETRY_DELAYS[attempt - 1];
-      console.log(`Gemini retry ${attempt}/${MAX_RETRIES} after ${delay / 1000}s...`);
-      await new Promise(r => setTimeout(r, delay));
-    }
-
-    try {
-      console.log(`Sending request to Gemini (${MODEL_NAME}, attempt ${attempt + 1})...`);
-      
-      const response = await ai.models.generateContent({
-        model: MODEL_NAME,
-        contents: prompt,
-        config: {
-          thinkingConfig: {
-            thinkingLevel: ThinkingLevel.HIGH,
-          },
-          systemInstruction: "You are a travel expert. Always respond with raw JSON.",
-          temperature: 0.7,
-        },
-      });
-
-      console.log('Gemini Response received:', response);
-
-      if (response && response.text) {
-        const text = response.text;
-        const parsed = extractJSON(text);
-
-        if (parsed) {
-          // Cache the result
-          try {
-            sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
-          } catch { /* storage full, ignore */ }
-          return parsed;
-        }
-        
-        throw new Error('GEMINI_JSON_EXTRACTION_FAILED');
-      }
-
-      throw new Error('GEMINI_INVALID_RESPONSE_FORMAT');
-    } catch (err) {
-      console.error('Gemini API Error Detail:', {
-        message: err.message,
-        status: err.status,
-        attempt: attempt + 1
-      });
-      
-      if (err.message.includes('429') || err.message.toLowerCase().includes('rate limit')) {
-        if (attempt === MAX_RETRIES - 1) throw new Error('GEMINI_RATE_LIMITED');
-        continue;
-      }
-
-      if (attempt === MAX_RETRIES - 1) throw err;
-    }
-  }
-}
+export default generateTravelSuggestions;

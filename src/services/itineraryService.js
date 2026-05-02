@@ -96,7 +96,8 @@ Return ONLY valid JSON:
 
 export async function generateItinerary(tripData) {
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY_MISSING');
+    console.warn('[Itinerary] Gemini API key missing, using fallback generator.');
+    return generateFallbackItinerary(tripData);
   }
 
   const prompt = buildPrompt(tripData);
@@ -140,11 +141,69 @@ export async function generateItinerary(tripData) {
       throw new Error('GEMINI_INVALID_RESPONSE_FORMAT');
     } catch (err) {
       if (err.message.includes('429') || err.message.toLowerCase().includes('rate limit')) {
-        if (attempt === MAX_RETRIES - 1) throw new Error('GEMINI_RATE_LIMITED');
+        if (attempt === MAX_RETRIES - 1) {
+          console.warn('[Itinerary] Rate limit reached, using fallback generator.');
+          return generateFallbackItinerary(tripData);
+        }
         continue;
       }
-      if (err.message.includes('403')) throw new Error('GEMINI_API_FORBIDDEN');
-      if (attempt === MAX_RETRIES - 1) throw err;
+      if (err.message.includes('403')) {
+        console.warn('[Itinerary] API Forbidden, using fallback generator.');
+        return generateFallbackItinerary(tripData);
+      }
+      if (attempt === MAX_RETRIES - 1) {
+        console.warn('[Itinerary] Unknown error, using fallback generator.');
+        return generateFallbackItinerary(tripData);
+      }
     }
   }
+}
+
+async function generateFallbackItinerary(tripData) {
+  const { destination, duration = 3 } = tripData;
+  const days = [];
+  
+  for (let i = 1; i <= duration; i++) {
+    const d = new Date(tripData.startDate);
+    d.setDate(d.getDate() + (i - 1));
+    
+    days.push({
+      day: i,
+      date: d.toISOString().split('T')[0],
+      title: i === 1 ? "Arrival & Exploration" : i === duration ? "Departure & Souvenirs" : "Local Highlights",
+      morning: { 
+        activity: `Explore ${destination} City Center`, 
+        location: `${destination} Main Square`, 
+        duration: "3 hours", 
+        tip: "Start early to avoid crowds.", 
+        estimated_cost: "Free",
+        photo: await fetchPlacePhoto(`${destination} City Center`)
+      },
+      afternoon: { 
+        activity: `Visit popular museum or landmark`, 
+        location: `${destination} Museum`, 
+        duration: "2-3 hours", 
+        tip: "Check entry times online.", 
+        estimated_cost: "Standard entry",
+        photo: await fetchPlacePhoto(`${destination} Museum`)
+      },
+      evening: { 
+        activity: `Dinner at local traditional restaurant`, 
+        location: `${destination} Old Town`, 
+        duration: "2 hours", 
+        tip: "Try the signature local dish.", 
+        estimated_cost: "Moderate",
+        photo: await fetchPlacePhoto(`${destination} Traditional Food`)
+      }
+    });
+  }
+
+  return {
+    days,
+    budget_summary: { estimated_daily_spend: "Moderate", total_estimated: "Varies", saving_tips: ["Use public transport", "Eat at local markets"] },
+    packing_tips: ["Comfortable walking shoes", "Weather-appropriate clothing", "Camera"],
+    local_transport: "Public transit, walking, or local taxis.",
+    generatedAt: new Date().toISOString(),
+    source: 'fallback'
+  };
 }
